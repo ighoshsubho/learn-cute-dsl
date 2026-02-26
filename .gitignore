@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.so
+*.egg-info/
+dist/
+build/
+cutlass/python/CuTeDSL/cutlass/_mlir/
