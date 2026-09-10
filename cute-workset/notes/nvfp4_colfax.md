@@ -1,4 +1,4 @@
-NVFP4 blog
+NVFP4 blog - https://research.colfax-intl.com/cutlass-tutorial-nvfp4-blockscaled-gemm-on-nvidia-rtx-pro-blackwell-gpus-sm12x/
 block scaled mma notes -
 "quads" stored by each thread see docs
 SFA or SFB stored in half or one of the quads in that thread
@@ -15,7 +15,7 @@ SMEM to RMEM copy, tiled copy -> thr,val layout from helpers -> make_fragment ->
 filter zeros and copy
 do mma and stuff
 
-NVFP4 OPTIM blog
+NVFP4 OPTIM blog - https://research.colfax-intl.com/optimizing-an-nvfp4-blockscaled-gemm-on-rtx-pro-6000-blackwell-gpu-sm120/
 1. Version 1 same kernel as previous
 2. version 2 check performance graph on ncu like sm sampling, dram throughput, l2 cache, l1 cache
 gemm is compute bound, so ideally you want to keep data in fast stuff possible

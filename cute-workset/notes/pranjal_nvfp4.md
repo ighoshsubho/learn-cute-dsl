@@ -1,4 +1,4 @@
-Pranjal NVFP4 KERNEL - 
+Pranjal NVFP4 KERNEL - https://cudaforfun.substack.com/p/outperforming-cublas-on-nvfp4
 Warps  Role
 -----  --------------------------------------------------------------------------------
 0-3    Read FP32 accumulators from TMEM, convert to FP16, and store
