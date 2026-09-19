@@ -1,0 +1,35 @@
+blog - https://pytorch.org/blog/low-precision-flash-attention-4-end-to-end-block-scaled-attention-for-blackwell/
+Notes -
+- when mxfp8 we have tmem as - s0/p0(128 cols) | s1/p1(128) | o0(128) | o1(128)
+- hence we cant store sfs or overlap just like that
+- we can use O(i) since s(i) hasnt started yet
+- in fp8 pi is 32 cols in tmem (in bf16 it was 64)
+- this means we store o(i) sfs in s(i) since already consumed
+- we store si sfs in s(1-i) accum only when softmax warps consume s(1-i) since we have 128-32=96 cols
+- before we arrive on barrier we want s(1-i) gemm for o should start to overlap transfer from tmem -> regs
+- unroll kv at the end basically removes the softmax bubble when we dont have new kv i+1
+- so we overlap with previous pv0 -> s0 -> pv1 -> s1
+- one issue is this causes the pv1 to push later and thus next softmax further due to updates being dependent
+- correction happens sequentially hence a bottleneck
+- hence they do row sum first and then wait on correction before softmax consumes correction
+- so scaling reques ops like (max, log, convert) and softmax does max already
+- we we can resuse max computer per 32 elem this yeilds better perf
+- constant scale for p can also be done since it improves perf and also keeps bet [0,1)
+- scale factors need to be aligned with 128 and so they are padded not entire seq
+- since backward needs one do in transposed scale that is dp=v@dot and dv=pt@do
+- they dont store two do scales like row scaled and col scaled
+- instead they store 32x32 block scale at once yes its bad but reuse is there
+- for backward they have - s/p(128) | dv (persistent) | dp/dq/ds | dk (persistent)
+- dv and dk is persistent cant use them to store sfs, need to use remaining
+- for first 2 gemms use dp and last 3 use s
+- dS is same way done 32x32 block quantized so they can save storing both row and col scaled
+- dS is computed in fp32 and we need to quantize for dQ and dK gemms
+- so its done intelligently with blackwell redux.sync.max.abs.f32
+- [32,32] quantization numerically acceptable
+- fp16 dq reduction for optimal performance with large sfs
+- at smaller ctx they overlap quantization of next kernel with epilog of current
+- rmsnorm + 32,32 mxfp8 gemms fusion, also in backward
+- GEMM also quantizes with its epilogue
+- jagged gemm backward with norm is handled properly with padding and stuff
+- e2e modules heavily fused for usecase of small shapes for their gem arch
+- their [32,32] block scale
