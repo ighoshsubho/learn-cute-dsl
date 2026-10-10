@@ -1,0 +1,16 @@
+blog - https://pytorch.org/blog/optimizing-jagged-flash-attention-with-tlx-the-road-toward-sota-fa4-on-blackwell/
+- jagged input creates severe load imbalance
+    - SM occupancy heatmap with Triton MPP can be done
+    - zig zag balancing with kv lengths during fwd
+    - L2 reuse based precomputed valid kv tiles in bkwd
+    - and then use clc on them (its like software + dynamic with clc)
+- stage d dimention reduce store in hbm
+- dQ can be released and can continue next tmem accum gaining 8-11% perf
+- load the last 1-2 slices at once in registers and red add from there
+- coz the gain is to run mma more
+- increase registers to softmax warp helps but shows bottleneck
+- branched masking caused compiler to lock more registers and not let free
+- so they divided the loop into no mask and mask
+- 2 cta collaborations in bkwd only such that -
+    - calculate with 2cta mma - S, dP, dV, dK, dQ
+    - with reduction of dsmem - dS
