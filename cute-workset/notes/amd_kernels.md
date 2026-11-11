@@ -1,0 +1,24 @@
+blog - https://rocm.blogs.amd.com/software-tools-optimization/matrix-cores-cdna/README.html?utm_source=chatgpt.com
+- increasing exponent increases the range of represented value
+- you need to remmeber there use to be exponent bias
+- we can cound the flops from the listed cycle count from this blog
+- the instrinsics are from llvm and we can use them by referring docs
+- rest is basically mapping rows and cols in amd gpu stuff
+blog - https://rocm.blogs.amd.com/software-tools-optimization/cdna4-gemm-kernels/README.html?utm_source=chatgpt.com
+- FP8 gemm optimization on CDNA 4
+- know your theritical TFLOPs and TFLOP/s
+- hipBLASlt benchmark do please
+- they first test the naive version
+- they they test the shared mem tiled version
+- replace fma with mfma instructions which takes from 4 to 30
+- so its basically gmem -> lds -> regs -> mfma -> fp32 accum write
+- lds is type of shared mem
+- vectorized load is packing 16 vals for fp8 together per load/write to lds
+- direct global load can be done bypassing vgprs like - gmem -> vgpr -> lds -> vgpr -> mfma
+- now it is gmem -> lds (with asm inst) -> mfma
+- this has 64 banks and ds_read_b128 access data in 4 phases
+- even after swizzle it leaves same latency due to mfma idle window and adds inst overhead
+- software pipeline with double buffering basically make lds write 1 after lds write 0 while doing lds read and mfma
+- we add more work here since amd chips have more wavefront and more registers and stuff so better reuse
+- 256x256_t512 gives best perf
+- 8 wave ping pong so we can load/compute simultaneously in simd, so its simd level parallelism
