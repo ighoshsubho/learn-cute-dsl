@@ -1,0 +1,17 @@
+blog - https://research.colfax-intl.com/accelerating-staple-networks-for-normalizing-flows-in-lattice-quantum-chromodynamics/
+- chromodynamics is the study of seperating nuclei into protons and neurons
+- but these when done with pen and paper approximations, breaks down
+- so QCD discritizes space time so thee can be simulated at large scale
+- for this usecase no need to use tensorcores for 3x3x3 matmul
+- they use FP64 cuda core and fuse into DFMA properly
+- more thread work and less instructions as possible
+- proper L2 and L1 loads done effectively and colasced loads
+- register pressure managed properly
+- usage of cp async so other work can be done while loads are in flight
+- rms normalization fused
+- then they count arithmatic intensity
+- usage of ring rotation of accumulators
+- they did wave quantization analysis as well
+- preicated oob so a whole sector computed as a 16b loads
+- instruction reordering so instructions are alteast 3 apart for more ilp
+- more work to be done here

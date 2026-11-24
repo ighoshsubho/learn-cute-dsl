@@ -1,0 +1,15 @@
+blog - https://thinkingmachines.ai/blog/end-to-end-4-bit-training/
+- ideally choose quantization where model effect is least
+- 32 block scale is bad compared to 16 block scale and
+- MXFP4 and MXFP8 only supports E8M0 which has wider range but very bad precision
+- NVFP4 becomes a good choice than MXFP4
+- NVFP4 allows to have x_fp4 * x_16_block_fp8 * x_tensor_fp32 where fp32 one allows to lower or higher the range
+- scale factor for 1x16 is very differet than 16x1 in backward
+- NVIDIA suggested having 16x16 scale factor to better be symmetric
+- 16 to 256 values is a big jump and causes lot of scale problem
+- use of Stochastic rounding SR with MXFP8 is best expectation based rounding
+- preserves forward pass rounding and independent of different scales of transpose and non transpose
+- they also modify combine by quantizing and dequantizing before avg
+- they quantize with fused kernels and several pranjal like quantization
+- they quantize in s2f6 and not mxfp8
+- it trained in 86 b300 nvl72 rack

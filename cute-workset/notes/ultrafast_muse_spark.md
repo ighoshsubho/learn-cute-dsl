@@ -1,0 +1,13 @@
+blog - https://www.lmsys.org/blog/2026-11-05-muse-spark-open-ultrafast
+- now megakernels are like multiprogramming phase in cpus
+- next maybe like operating systems where we have process, threads, dma, busy wait, message pass and profiler like cpus
+- they did 2 all gathers for moe expert instead of 1 all reduce since they made intermediate w13 comp fp4
+- different warps different roles and attention merge since heads segregated we need to out project and sum
+- speculative decoding 16 tokens verification gives on avg 6.6 acceptance
+- with big kernels comes big responsibilities like instruction cache (not register spills)
+- instruction cache is a piece of code converted into cuda binary and fetched in l2
+- then we use this cache with different techniques like dry run to fetch and warm etc
+- across warps they use mbarriers to sync
+- busy waiting by polling with acquire fence
+- they use lamport transfer that polls instead of using fence
+- profile and overlap overlap and overlap!!! let agents explore search space!!
